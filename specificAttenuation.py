@@ -8,8 +8,6 @@ import SpectralTable
 class Env(Enum):
     OXYGEN=0
     WATER=1
-class Constants:
-    a1 =1
 
 #Water Vapor Partial Pressure: e
 #Dry Air Pressure: p
@@ -17,6 +15,9 @@ class Constants:
 
 def water_vapor_partial_pressure(water_vapor_density, temp):
     return (water_vapor_density*temp)/216.7
+
+def dry_air_pressure(barometric_pressure, water_vapor_partial_pressure):
+    return barometric_pressure - water_vapor_partial_pressure
 
 def specific_gaseous_attenuation(frequency, dry_air_pressure, water_vapor_partial_pressure, temp):
     NOXYGEN = N_oxygen(frequency, dry_air_pressure, water_vapor_partial_pressure, temp)
