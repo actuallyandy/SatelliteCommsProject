@@ -19,11 +19,6 @@ def water_vapor_partial_pressure(water_vapor_density, temp):
 def dry_air_pressure(barometric_pressure, water_vapor_partial_pressure):
     return barometric_pressure - water_vapor_partial_pressure
 
-def specific_gaseous_attenuation(frequency, dry_air_pressure, water_vapor_partial_pressure, temp):
-    NOXYGEN = N_oxygen(frequency, dry_air_pressure, water_vapor_partial_pressure, temp)
-    NWATER = N_waterVapor(frequency, dry_air_pressure, water_vapor_partial_pressure, temp)
-    gamma = 0.1820 * (NOXYGEN + NWATER)
-    return gamma
 
 
 def N_oxygen(frequency, dry_air_pressure, water_vapor_partial_pressure, temp):
