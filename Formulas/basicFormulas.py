@@ -3,7 +3,7 @@
 
 import math
 from enum import Enum
-import SpectralTable
+import Formulas.SpectralTable as SpectralTable
 
 class Env(Enum):
     OXYGEN=0
@@ -23,9 +23,11 @@ class basicFormulaCoefficients:
 #Dry Air Pressure: p
 #Elevation Angle: theta
 
+#Should be in hectopascals hPa
 def water_vapor_partial_pressure(water_vapor_density, temp):
     return (water_vapor_density*temp)/216.7
 
+#Should be hectopascals hPa
 def dry_air_pressure(barometric_pressure, water_vapor_partial_pressure):
     return barometric_pressure - water_vapor_partial_pressure
 

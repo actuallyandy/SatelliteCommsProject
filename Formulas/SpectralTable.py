@@ -3,7 +3,7 @@
 #Preface: This is not a good way to code this, but I am short on time and I'm copying these values from this pdf: 
 #https://www.itu.int/dms_pubrec/itu-r/rec/p/R-REC-P.676-13-202208-I!!PDF-E.pdf
 
-import linear_interpolation
+import Formulas.linear_interpolation as linear_interpolation
 
 
 class Oxygen:

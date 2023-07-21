@@ -1,6 +1,6 @@
 #Author: Andres Ortiz
 
-import saturationVaporPressure
+import Formulas.saturationVaporPressure as saturationVaporPressure
 
 
 def getWaterVaporDensity(relativeHumidity, Temp):
