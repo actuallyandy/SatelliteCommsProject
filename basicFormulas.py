@@ -9,6 +9,16 @@ class Env(Enum):
     OXYGEN=0
     WATER=1
 
+class basicFormulaCoefficients:
+    def __init__(self, a1, a2, a3, a4, a5, a6) -> None:
+        self.a1 = a1
+        self.a2 = a2
+        self.a3 = a3
+        self.a4 = a4
+        self.a5 = a5
+        self.a6 = a6
+        
+
 #Water Vapor Partial Pressure: e
 #Dry Air Pressure: p
 #Elevation Angle: theta
@@ -21,30 +31,32 @@ def dry_air_pressure(barometric_pressure, water_vapor_partial_pressure):
 
 
 
-def N_oxygen(frequency, dry_air_pressure, water_vapor_partial_pressure, temp):
+def N_oxygen(frequency, dry_air_pressure, water_vapor_partial_pressure, temp, oxygen_data, basicCoeff):
     retVal = 0
-    SpectralLineNum = SpectralTable.Oxygen.length
+    SpectralLineNum = oxygen_data.length
     ND = drycontinuum(frequency, dry_air_pressure, water_vapor_partial_pressure, temp)
     for i in range(SpectralLineNum):
         theta = 300/temp
-        lineStrength = a1 * math.pow(10,-7) * dry_air_pressure * math.pow(theta, 3) * math.exp(a2*(1-theta))
+        lineStrength = basicCoeff.a1 * math.pow(10,-7) * dry_air_pressure * math.pow(theta, 3) * math.exp(basicCoeff.a2*(1-theta))
         retVal += lineStrength*lineShape_factor(type=Env.OXYGEN,index=i,frequency=frequency,
-                                                temp=temp, dry_air_pressure=dry_air_pressure, water_vapor_partial_pressure=water_vapor_partial_pressure) + ND
+                                                temp=temp, dry_air_pressure=dry_air_pressure, 
+                                                water_vapor_partial_pressure=water_vapor_partial_pressure,basicCoeff=basicCoeff) + ND
     return retVal
 
-def N_waterVapor(frequency, dry_air_pressure, water_vapor_partial_pressure, temp):
+def N_waterVapor(frequency, dry_air_pressure, water_vapor_partial_pressure, temp, water_data, basicCoeff):
     retVal = 0
-    SpectralLineNum = SpectralTable.Water.length
+    SpectralLineNum = water_data.length
     for i in range(SpectralLineNum):
         theta = 300/temp
-        lineStrength = b1 * math.pow(10,-1) * water_vapor_partial_pressure * math.pow(theta,3.5) * math.exp(b2 * (1-theta))
+        lineStrength = basicCoeff.a1 * math.pow(10,-1) * water_vapor_partial_pressure * math.pow(theta,3.5) * math.exp(basicCoeff.a2 * (1-theta))
         retVal += lineStrength*lineShape_factor(type=Env.WATER, index=i, frequency=frequency, 
-                                                temp=temp, dry_air_pressure=dry_air_pressure, water_vapor_partial_pressure=water_vapor_partial_pressure)
+                                                temp=temp, dry_air_pressure=dry_air_pressure, 
+                                                water_vapor_partial_pressure=water_vapor_partial_pressure, basicCoeff=basicCoeff)
     return retVal
 
-def lineShape_factor(type,index,frequency, temp, dry_air_pressure, water_vapor_partial_pressure):
-    deltaF = ZeemanSplitting(type, index, dry_air_pressure, water_vapor_partial_pressure, temp)
-    dirac = correctionFactor(type, temp, dry_air_pressure, water_vapor_partial_pressure)
+def lineShape_factor(type,index,frequency, temp, dry_air_pressure, water_vapor_partial_pressure, basicCoeff):
+    deltaF = ZeemanSplitting(type, index, dry_air_pressure, water_vapor_partial_pressure, temp, basicCoeff)
+    dirac = correctionFactor(type, temp, dry_air_pressure, water_vapor_partial_pressure, basicCoeff)
     lineFreq = getLineFrequency(type, index)
     RHS_denom = math.pow(lineFreq+frequency,2) + math.pow(deltaF,2)
     RHS_numer = deltaF - dirac*(lineFreq+frequency)
@@ -53,12 +65,11 @@ def lineShape_factor(type,index,frequency, temp, dry_air_pressure, water_vapor_p
     RHS = RHS_numer/RHS_denom
     LHS = LHS_numer/LHS_denom
     prefix = frequency/lineFreq
-
     factor = prefix * (LHS + RHS)
     return factor
 
-def ZeemanSplitting(type,index, dry_air_pressure, water_vapor_partial_pressure, temp):
-    deltaF = lineWidth(type,temp,dry_air_pressure,water_vapor_partial_pressure)
+def ZeemanSplitting(type,index, dry_air_pressure, water_vapor_partial_pressure, temp, basicCoeff):
+    deltaF = lineWidth(type,temp,dry_air_pressure,water_vapor_partial_pressure, basicCoeff)
     theta = 300/temp
     if (type == Env.OXYGEN):
         new_deltaF = math.sqrt(math.pow(deltaF,2) + 2.25 * math.pow(10,-6))
@@ -66,18 +77,18 @@ def ZeemanSplitting(type,index, dry_air_pressure, water_vapor_partial_pressure, 
         new_deltaF = 0.525 * deltaF + math.sqrt(0.217 * math.pow(deltaF,2) + (2.1316 * math.pow(10,-12) * math.pow(getLineFrequency(Env.WATER,index),2)/theta))
     return new_deltaF
 
-def lineWidth(type,temp, dry_air_pressure, water_vapor_partial_pressure):
+def lineWidth(type,temp, dry_air_pressure, water_vapor_partial_pressure, basicCoeff):
     theta = 300/temp
     if (type == Env.OXYGEN):
-        retVal = a3 * math.pow(10,-4) * (dry_air_pressure * math.pow(theta, 0.8-a4) + 1.1 * water_vapor_partial_pressure * theta)
+        retVal = basicCoeff.a3 * math.pow(10,-4) * (dry_air_pressure * math.pow(theta, 0.8-basicCoeff.a4) + 1.1 * water_vapor_partial_pressure * theta)
     else:
-        retVal = b3 * math.pow(10,-4) * (dry_air_pressure * math.pow(theta, b4) + b5 * water_vapor_partial_pressure * math.pow(theta, b6))
+        retVal = basicCoeff.a3 * math.pow(10,-4) * (dry_air_pressure * math.pow(theta, basicCoeff.a4) + basicCoeff.a5 * water_vapor_partial_pressure * math.pow(theta, basicCoeff.a6))
     return retVal
 
-def correctionFactor(type, temp, dry_air_pressure, water_vapor_partial_pressure):
+def correctionFactor(type, temp, dry_air_pressure, water_vapor_partial_pressure, basicCoeff):
     theta = 300/temp
     if (type == Env.OXYGEN):
-        dirac = (a5 + a6 * theta) * math.pow(10,-4) * (dry_air_pressure+water_vapor_partial_pressure) * math.pow(theta,0.8)
+        dirac = (basicCoeff.a5 + basicCoeff.a6 * theta) * math.pow(10,-4) * (dry_air_pressure+water_vapor_partial_pressure) * math.pow(theta,0.8)
     else:
         dirac = 0
     return dirac
