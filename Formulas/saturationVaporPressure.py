@@ -5,7 +5,7 @@ import math
 
 #Temperature input must be in celcius
 def saturationVaporPressureWater(Temp):
-    num = math.exp(34.494 -(4924.99/(Temp+273.15)))
+    num = math.exp(34.494 -(4924.99/(Temp+237.1)))
     den = math.pow(Temp+105,1.57)
     saturationPressure = num/den
     return saturationPressure
