@@ -18,7 +18,6 @@ class Application(tk.Tk):
         self.geometry("1600x1200")
 
         self.getCityData()
-        #TODO: update this with a tool that reads cities in from a file
         #First we want to load the Water and Oxygen data and Coefficients of interest
         self.oxygen_data = ST.loadOxygenData()
         self.water_data = ST.loadWaterData()
@@ -53,23 +52,28 @@ class Application(tk.Tk):
         # Create the elevation slider
         self.elevation_slider_label = tk.Label(self, text="Elevation:")
         self.elevation_slider_label.grid(row=3, column=0, padx=10, pady=5)
-        self.elevation_slider = tk.Scale(self, from_=2, to=90, orient=tk.HORIZONTAL, command=self.on_elevation_slider_change)
+        self.elevation_slider = tk.Scale(self, from_=2, to=90, orient=tk.HORIZONTAL, command=self.on_slider_change)
         self.elevation_slider.grid(row=3, column=1, padx=10, pady=5)
+
+        self.recalculate_label = tk.Label(self, text="Recalculate")
+        self.recalculate_label.grid(row=4, column=1, padx=10, pady=5)
+        self.recalculate_button = tk.Button(self, command=self.checkRecalculate, state=tk.DISABLED)
+        self.recalculate_button.grid(row=5, column=1, padx=10, pady=5)
 
         #Create Pressure, Water Vapor Denisty, Temperature
         self.pressure_label = tk.Label(self, text="Pressure:")
-        self.pressure_label.grid(row = 4, column=0, padx=10, pady=5)
+        self.pressure_label.grid(row = 6, column=0, padx=10, pady=5)
         self.wvd_label = tk.Label(self, text="Water Vapor Density")
-        self.wvd_label.grid(row = 5, column=0, padx=10, pady=5)
+        self.wvd_label.grid(row = 7, column=0, padx=10, pady=5)
         self.temperature_label = tk.Label(self, text="Temperature")
-        self.temperature_label.grid(row = 6, column=0, padx=10, pady=5)
+        self.temperature_label.grid(row = 8, column=0, padx=10, pady=5)
 
         self.pressure_value_label = tk.Label(self, text="0 hPA")
-        self.pressure_value_label.grid(row = 4, column=1, padx=10, pady=5)
+        self.pressure_value_label.grid(row = 6, column=1, padx=10, pady=5)
         self.wvd_value_label = tk.Label(self, text="0 g/m^3")
-        self.wvd_value_label.grid(row = 5, column=1, padx=10, pady=5)
+        self.wvd_value_label.grid(row = 7, column=1, padx=10, pady=5)
         self.temperature_value_label = tk.Label(self, text="0 C")
-        self.temperature_value_label.grid(row = 6, column=1, padx=10, pady=5)
+        self.temperature_value_label.grid(row = 8, column=1, padx=10, pady=5)
 
 
         # Create matplotlib figures for the plots
@@ -80,22 +84,38 @@ class Application(tk.Tk):
 
         # Create the canvas widgets for the plots
         self.canvas1 = FigureCanvasTkAgg(self.figure1, master=self)
-        self.canvas1.get_tk_widget().grid(row=0, column=2, padx=10, pady=10, columnspan=4, rowspan=8)
+        self.canvas1.get_tk_widget().grid(row=0, column=2, padx=10, pady=10, columnspan=4, rowspan=16)
 
         self.canvas2 = FigureCanvasTkAgg(self.figure2, master=self)
-        self.canvas2.get_tk_widget().grid(row=0, column=6, padx=10, pady=10, columnspan=4, rowspan=8)
+        self.canvas2.get_tk_widget().grid(row=0, column=6, padx=10, pady=10, columnspan=4, rowspan=16)
 
         self.canvas3 = FigureCanvasTkAgg(self.figure3, master=self)
-        self.canvas3.get_tk_widget().grid(row=8, column=2, padx=10, pady=10, columnspan=4, rowspan=8)
+        self.canvas3.get_tk_widget().grid(row=16, column=2, padx=10, pady=10, columnspan=4, rowspan=16)
 
         self.canvas4 = FigureCanvasTkAgg(self.figure4, master=self)
-        self.canvas4.get_tk_widget().grid(row=8, column=6, padx=10, pady=10, columnspan=4, rowspan=8)
+        self.canvas4.get_tk_widget().grid(row=16, column=6, padx=10, pady=10, columnspan=4, rowspan=16)
 
-    def on_elevation_slider_change(self, *args):
-        self.elevation_slider.config(state=tk.DISABLED)
+    def on_slider_change(self, *args):
+        self.recalculate_button.config(state=tk.NORMAL)
+
+    def checkRecalculate(self, *args):
+        self.recalculate_button.config(state=tk.DISABLED)
+        lat = float(self.lat_entry.get())
+        lon = float(self.lon_entry.get())
+        city = self.dropdown.get()
+        if city != "Unknown":
+            act_lat = self.city_data[city]["latitude"]
+            act_lon = self.city_data[city]["longitude"]
+        else:
+            act_lat = -1
+            act_lon = -1
+        if lat != act_lat or lon != act_lon:
+            self.dropdown.set("Unknown")
+            self.updateAllPlots(lat,lon)
+            return
         #Callback function to update plots #3 and #4 when elevation is changed.
         self.updateElevationPlots()
-        self.elevation_slider.config(state=tk.NORMAL)
+        
 
     def on_dropdown_city_change(self, *args):
         self.dropdown.config(state=tk.DISABLED)

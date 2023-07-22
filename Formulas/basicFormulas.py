@@ -84,13 +84,7 @@ def lineStrengthWater(theta, basicCoeff, water_vapor_partial_pressure):
 
 def lineShape_factor(type,index,frequency, temp, dry_air_pressure, water_vapor_partial_pressure, data, basicCoeff):
     deltaF = ZeemanSplitting(type, index, dry_air_pressure, water_vapor_partial_pressure, temp, data, basicCoeff)
-    if deltaF < 0 and type == Env.OXYGEN:
-        pass
-        #print("FUCK ZEEMAN")
     dirac = correctionFactor(type, temp, dry_air_pressure, water_vapor_partial_pressure, basicCoeff)
-    if dirac < 0:
-        pass
-        #print("FUCK DIRAC")
     lineFreq = getLineFrequency(type, data, index)
     RHS_denom = math.pow(lineFreq+frequency,2) + math.pow(deltaF,2)
     RHS_numer = deltaF - dirac*(lineFreq+frequency)
@@ -99,10 +93,7 @@ def lineShape_factor(type,index,frequency, temp, dry_air_pressure, water_vapor_p
     RHS = RHS_numer/RHS_denom
     LHS = LHS_numer/LHS_denom
     prefix = frequency/lineFreq
-    factor = prefix * (LHS + RHS)
-    if factor < 0:
-        #print("FUCK ME")
-        pass
+    factor = prefix * abs(LHS + RHS)
     return factor
 
 def ZeemanSplitting(type,index, dry_air_pressure, water_vapor_partial_pressure, temp, data, basicCoeff):
