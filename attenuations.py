@@ -25,7 +25,7 @@ def slantPath_instantanueousOxygen_attenuation(frequency, barometric_pressure, T
     gamma = 0.1820 * frequency * basicFormulas.N_oxygen(frequency=frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, oxygen_data=OXD, basicCoeff=BC)
     coefficients = getCoefficients(frequency,coi)
     h0 = coefficients[0]+coefficients[1]*Temperature+coefficients[2]*barometric_pressure+coefficients[3]*water_vapor_density
-    A0 = (gamma*h0)/math.sin(elevation)
+    A0 = (gamma*h0)/math.sin(math.radians(elevation))
     return A0
 
 #Valid frequency Range 22.235080 to 1780 GHz
@@ -39,7 +39,7 @@ def slantPath_instantanueousWater_attenuation(frequency, barometric_pressure, Te
     hw = 5.6585 * math.pow(10,-5) * frequency + 1.8348
     for i in range (2):
         hw += a_list[i]/(math.pow(frequency-freq_list[i],2)+b_list[i])
-    AW = (gamma * hw)/math.sin(elevation)
+    AW = (gamma * hw)/math.sin(math.radians(elevation))
     return AW
 
 class CoefficientsOfInterest:
