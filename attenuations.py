@@ -3,6 +3,13 @@ import Formulas.basicFormulas as basicFormulas
 import Formulas.linear_interpolation as linear_interpolation
 import math
 
+"""
+Coefficient of Oxygen valid for 50.474214 to 834.145546 GHZ
+Coefficient of Water valid for 22.235080 to 1 780 GHZ
+COI for Oxygen valid for 1.00  to 350 GHZ
+"""
+
+#Valid frequency Range 50.474214 to 834.145546 GHZ
 def specific_gaseous_attenuation(frequency, barometric_pressure, water_vapor_density, Temperature, OXD, WD, OBC, WBC):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
     ps = barometric_pressure-es
@@ -11,15 +18,17 @@ def specific_gaseous_attenuation(frequency, barometric_pressure, water_vapor_den
     gamma = 0.1820 * frequency * (NOXYGEN + NWATER)
     return gamma
 
+#Valid frequency Range 50.474214 to 350 GHZ
 def slantPath_instantanueousOxygen_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, OXD, BC, coi):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
     ps = barometric_pressure-es
     gamma = 0.1820 * frequency * basicFormulas.N_oxygen(frequency=frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, oxygen_data=OXD, basicCoeff=BC)
     coefficients = getCoefficients(frequency,coi)
-    h0 = coefficients.index(0)+coefficients.index(1)*Temperature+coefficients.index(2)*barometric_pressure+coefficients.index(3)*water_vapor_density
+    h0 = coefficients[0]+coefficients[1]*Temperature+coefficients[2]*barometric_pressure+coefficients[3]*water_vapor_density
     A0 = (gamma*h0)/math.sin(elevation)
     return A0
 
+#Valid frequency Range 22.235080 to 1780 GHz
 def slantPath_instantanueousWater_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, WD, BC):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
     ps = barometric_pressure-es
@@ -29,7 +38,7 @@ def slantPath_instantanueousWater_attenuation(frequency, barometric_pressure, Te
     b_list = [2.7649, 4.9219, 3.0748]
     hw = 5.6585 * math.pow(10,-5) * frequency + 1.8348
     for i in range (2):
-        hw += a_list(i)/(math.pow(frequency-freq_list(i),2)+b_list(i))
+        hw += a_list[i]/(math.pow(frequency-freq_list[i],2)+b_list[i])
     AW = (gamma * hw)/math.sin(elevation)
     return AW
 
