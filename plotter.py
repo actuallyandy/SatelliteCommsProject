@@ -6,6 +6,7 @@ import Formulas.basicFormulas as BF
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.gridspec as gridspec
 import tkinter as tk
 from tkinter import ttk
 from mpl_toolkits.basemap import Basemap
@@ -85,6 +86,7 @@ class Application(tk.Tk):
         # Create the canvas widgets for the plots
         self.canvas1 = FigureCanvasTkAgg(self.figure1, master=self)
         self.canvas1.get_tk_widget().grid(row=0, column=2, padx=10, pady=10, columnspan=4, rowspan=16)
+        
 
         self.canvas2 = FigureCanvasTkAgg(self.figure2, master=self)
         self.canvas2.get_tk_widget().grid(row=0, column=6, padx=10, pady=10, columnspan=4, rowspan=16)
@@ -245,10 +247,12 @@ class Application(tk.Tk):
         self.plotInstantaneousWater(frequency_band_W, instantWater_list, lat, long)
 
     def plotMercator(self):
-        ax1 = self.figure1.add_subplot(111)
+        gs = gridspec.GridSpec(1,1)
+        ax1 = self.figure1.add_subplot(gs[0,0])
+        self.figure1.subplots_adjust(left=0, right=1, bottom=0, top=1)
         m = Basemap(ax=ax1, projection='merc', llcrnrlat=-80, urcrnrlat=80, llcrnrlon=-180, urcrnrlon=180, resolution='l')
-        m.fillcontinents(color='lightgreen', lake_color='lightblue')
-        m.drawmapboundary(fill_color='cyan')
+        m.fillcontinents(color=(0, 158/255, 96/255), lake_color=(0,119/255, 190/255))
+        m.drawmapboundary(fill_color=(0,119/255, 190/255))
         m.drawcoastlines()
         m.drawcountries()
         
