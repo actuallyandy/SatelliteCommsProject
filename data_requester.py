@@ -4,6 +4,8 @@
 import requests
 import Formulas.water_vapor_density as WVD
 
+#This function will make a GET request to the openweather map API
+#and will return weather data at specified latitude and longitude in a json format
 def get_weather_data(latitude, longitude, api_key):
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={api_key}"
     response = requests.get(url)
@@ -14,7 +16,8 @@ def get_weather_data(latitude, longitude, api_key):
     else:
         print("Failed to fetch weather data.")
         return None
-
+#This function will pull the required variables from the API response and perform calculations
+#to put it into a format digestible by the attenuation formulas.
 def extract_weather_info(weather_data):
     if weather_data:
         pressure = weather_data["main"]["pressure"]  # Barometric pressure in hPa
@@ -27,11 +30,7 @@ def extract_weather_info(weather_data):
         return pressure, water_vapor_density, temperature
     else:
         return None, None, None
-
-
-
-
-
+#This function loads in the api key file. Please use your own API key
 def loadAPIkey():
     filepath = "./api_key"
     with open(filepath, "r") as file:

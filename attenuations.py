@@ -9,6 +9,8 @@ Coefficient of Water valid for 22.235080 to 1 780 GHZ
 COI for Oxygen valid for 1.00  to 350 GHZ
 """
 
+#This function calculates the specific gaseous attenuation due to dry air and water vapor
+#Equation: y = 0.1820*f*(N"_ox(f)+N"_wv(f))
 #Valid frequency Range 50.474214 to 834.145546 GHZ
 def specific_gaseous_attenuation(frequency, barometric_pressure, water_vapor_density, Temperature, OXD, WD):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
@@ -18,6 +20,9 @@ def specific_gaseous_attenuation(frequency, barometric_pressure, water_vapor_den
     gamma = 0.1820 * frequency * (NOXYGEN + NWATER)
     return gamma
 
+#This function calculates the slant path instantaneous gaseous attenuation attributable to oxygen.
+#Equation: A0 = y0*h0/sin(theta)
+#Equation h0 = a0 +b0*T + c0*P +d0*wvd  These coefficients have to be interpolated
 #Valid frequency Range 50.474214 to 350 GHZ
 def slantPath_instantanueousOxygen_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, OXD, coi):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
@@ -28,6 +33,9 @@ def slantPath_instantanueousOxygen_attenuation(frequency, barometric_pressure, T
     A0 = (gamma*h0)/math.sin(math.radians(elevation))
     return A0
 
+#This function calculates the slant path instantaneous gaseous attenuation attributable to water vapor
+#Equation: Aw = yw*hw/sin(theta)
+#Equation: hw = Af+B + sum (ai/(f-fi)^2 +bi)
 #Valid frequency Range 22.235080 to 1780 GHz
 def slantPath_instantanueousWater_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, WD):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
@@ -41,7 +49,7 @@ def slantPath_instantanueousWater_attenuation(frequency, barometric_pressure, Te
         hw += a_list[i]/(math.pow(frequency-freq_list[i],2)+b_list[i])
     AW = (gamma * hw)/math.sin(math.radians(elevation))
     return AW
-
+#This class holds a list of coefficients to calculate slant path values via interpolation
 class CoefficientsOfInterest:
     def __init__(self) -> None:
         self.frequency = []
@@ -50,8 +58,7 @@ class CoefficientsOfInterest:
         self.c = []
         self.d = []
         self.length = -1
-
-
+#This function reads in the coefficients of interest file
 def loadCoefficients():
     filepath = "./coefficientsOfInterestOxygen.txt"
     coi = CoefficientsOfInterest()
@@ -68,6 +75,8 @@ def loadCoefficients():
     coi.length = len(coi.frequency)
     return coi
 
+#This function will perform a linear interpolation to calculate coefficients 
+#required for the slant path oxygen equation
 def getCoefficients(frequency, coi):
     x_points = coi.frequency
     a_points = coi.a

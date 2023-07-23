@@ -72,10 +72,6 @@ def lineStrengthWater(theta, water_vapor_partial_pressure, b1, b2):
     return lineStrength
 
 #This function defines the line shape factor based on a table frequency and the input frequency.
-#WARNING: AN assumption had to be made here for the inclusion of the abs function. The ITU report
-#does not specify whether the function has absolute value applied to it or not. However, the output
-#of this equation will be negative at certain frequencies which makes no sense. Therefore I'm assuming
-#the adjustment factor will be abs'ed
 #Equation: Fi = f/fi * [ dF-dirac(fi-f)/(fi-f)^2 +dF^2    +    dF-dirac(fi+f)/(fi+f)^2 + dF^2    ]
 def lineShape_factor(type,index,frequency, temp, dry_air_pressure, water_vapor_partial_pressure, data):
     deltaF = ZeemanSplitting(type, index, dry_air_pressure, water_vapor_partial_pressure, temp, data)
@@ -91,16 +87,20 @@ def lineShape_factor(type,index,frequency, temp, dry_air_pressure, water_vapor_p
     factor = prefix * (LHS + RHS) #Here is the assumptioni
     return factor
 
-#This function calculates the Zeeman splitting
+#This function calculates the Zeeman splitting of oxygen lines and Doppler broadening of water vapor lines
+#Equation for oxygen: dF = sqrt( df^2 + 2.25E-6)
+#Equation for water vapor: dF = 0.535 dF + sqrt(0.217dF^2 + 2.1316E-12Fi^2/theta)
 def ZeemanSplitting(type,index, dry_air_pressure, water_vapor_partial_pressure, temp, data):
     deltaF = lineWidth(type,temp,dry_air_pressure,water_vapor_partial_pressure, data, index)
     theta = 300/temp
     if (type == Env.OXYGEN):
         new_deltaF = math.sqrt(math.pow(deltaF,2) + 2.25 * math.pow(10,-6))
     else:
-        new_deltaF = 0.525 * deltaF + math.sqrt(0.217 * math.pow(deltaF,2) + (2.1316 * math.pow(10,-12) * math.pow(getLineFrequency(Env.WATER,data,index),2)/theta))
+        new_deltaF = 0.535 * deltaF + math.sqrt(0.217 * math.pow(deltaF,2) + (2.1316 * math.pow(10,-12) * math.pow(getLineFrequency(Env.WATER,data,index),2)/theta))
     return new_deltaF
-
+#This function calculates the line width
+#Equation for oxygen: dF = a3E-4 * (p*theta^(0.8-a4) + 1.1*e*Theta)
+#Equation for water vapor: dF = b3E-4 * (p * theta^b4 + b5*e*theta^b6)
 def lineWidth(type,temp, dry_air_pressure, water_vapor_partial_pressure, data, index):
     theta = 300/temp
     if (type == Env.OXYGEN):
@@ -110,6 +110,8 @@ def lineWidth(type,temp, dry_air_pressure, water_vapor_partial_pressure, data, i
                                                      + data.a5[index] * water_vapor_partial_pressure * math.pow(theta, data.a6[index]))
     return retVal
 
+#This function calculates a correction factor due to the interference effects in oxygen lines
+#Equation for oxygen: d = (a5+a6)E-4 * (p+e)theta^0.8
 def correctionFactor(type, temp, dry_air_pressure, water_vapor_partial_pressure, data, index):
     theta = 300/temp
     if (type == Env.OXYGEN):
@@ -118,7 +120,9 @@ def correctionFactor(type, temp, dry_air_pressure, water_vapor_partial_pressure,
         dirac = 0
     return dirac
 
-
+#This function calculates the dry air continuum that arises from the non-resonant Debye spectrum of oxygen
+#below 10GHz and a pressure-induced nitrogen attenuation above 100GHz
+#Equation: N"_D(f) = f*p*theta^2*[ 6.14E-5/(d[1+(f/d)^2]) + 1.4E-12 *p*theta^1.5/1+1.9E-5*f^1.5 ]
 def drycontinuum(frequency, dry_air_pressure, water_vapor_partial_pressure, temp):
     theta = temp/300
     d = width_parameter_debye(dry_air_pressure, water_vapor_partial_pressure, theta)
@@ -130,11 +134,11 @@ def drycontinuum(frequency, dry_air_pressure, water_vapor_partial_pressure, temp
     prefix = dry_air_pressure * frequency * math.pow(theta, 2)
     ND = prefix*(L+R)
     return ND
-
+#This function calculates the width parameter for the Debye spectrum
 def width_parameter_debye(dry_air_pressure, water_vapor_partial_pressure, theta):
     return 5.6 * math.pow(10,-4) * (dry_air_pressure + water_vapor_partial_pressure)*math.pow(theta,0.8)
 
-
+#This function gets the table frequency at a specific index
 def getLineFrequency(type, data, index):
     if (type == Env.OXYGEN):
         return data.frequency[index]
@@ -142,5 +146,3 @@ def getLineFrequency(type, data, index):
         return data.frequency[index]
 
 
-if __name__ == "__main__":
-    print("Cheerio")

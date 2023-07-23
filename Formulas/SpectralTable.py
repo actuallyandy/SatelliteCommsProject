@@ -6,6 +6,7 @@
 import Formulas.linear_interpolation
 
 
+#This class is used to hold the table of oxygen data coefficients
 class Oxygen:
     def __init__(self) -> None:
         self.frequency = []
@@ -16,7 +17,7 @@ class Oxygen:
         self.a5 = []
         self.a6 = []
         self.length = -1
-
+#This class is used to hold the table of water vapor data coefficients
 class Water:
     def __init__(self) -> None:
         self.frequency = []
@@ -28,6 +29,8 @@ class Water:
         self.a6 = []
         self.length = -1
 
+#This function reads the oxygen coefficients and adds it to a class that
+#contains a bunch of lists
 def loadOxygenData():
     filepath = "./Formulas/coefficientsOxygen.txt"
     oxygen = Oxygen()
@@ -46,6 +49,8 @@ def loadOxygenData():
     oxygen.length = len(oxygen.frequency)
     return oxygen
 
+#This function reads the water vapor coefficients and adds it to a class
+#that contains a bunch of lists
 def loadWaterData():
     filepath = "./Formulas/coefficientsWater.txt"
     water = Water()
@@ -64,6 +69,8 @@ def loadWaterData():
     water.length = len(water.frequency)
     return water
 
+#This function is designed to test the linear interpolation between coefficients and
+#how they are stored in the classes listed above
 def interpolateCoefficients(frequency, data):
     if isinstance(data, Oxygen):
         if frequency<data.frequency[0] or frequency>data.frequency[data.length-1]:
