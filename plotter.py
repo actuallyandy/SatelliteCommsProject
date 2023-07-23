@@ -238,16 +238,28 @@ class Application(tk.Tk):
             Temperature=self.temperature, elevation=elevation, WD=self.water_data, BC=W_basic_coefficients_W)
             for freq, W_basic_coefficients_W in zip(frequency_band_W, W_basic_coefficients_list_W)]
 
-        self.plotMercator(lat, long)
+        self.plotMercator()
+        self.plotMercatorPoint(lat, long)
         self.plotAttenuationFrequencyBand(frequency_band_SA, spga_list, lat, long)
         self.plotInstantaneousOxygen(frequency_band_OX, instantOxygen_list, lat, long)
         self.plotInstantaneousWater(frequency_band_W, instantWater_list, lat, long)
 
-    def plotMercator(self,lat, long):
-        pass
+    def plotMercator(self):
+        ax1 = self.figure1.add_subplot(111)
+        m = Basemap(ax=ax1, projection='merc', llcrnrlat=-80, urcrnrlat=80, llcrnrlon=-180, urcrnrlon=180, resolution='l')
+        m.fillcontinents(color='lightgreen', lake_color='lightblue')
+        m.drawmapboundary(fill_color='cyan')
+        m.drawcoastlines()
+        m.drawcountries()
+        
+        self.canvas1.draw()
 
+    def plotMercatorPoint(self, mlat, mlon):
+        ax1 = self.figure1.gca()
+        ax1.scatter(mlat, mlon, color='red', s=50)
+        self.canvas1.draw()
 
-    def mercator_projection(self, lon, lat):
+    def mercator_projection(self, lat, lon):
         """
         Convert latitude and longitude to Mercator coordinates.
         """
