@@ -10,29 +10,29 @@ COI for Oxygen valid for 1.00  to 350 GHZ
 """
 
 #Valid frequency Range 50.474214 to 834.145546 GHZ
-def specific_gaseous_attenuation(frequency, barometric_pressure, water_vapor_density, Temperature, OXD, WD, OBC, WBC):
+def specific_gaseous_attenuation(frequency, barometric_pressure, water_vapor_density, Temperature, OXD, WD):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
     ps = barometric_pressure-es
-    NOXYGEN = basicFormulas.N_oxygen(frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature,oxygen_data=OXD, basicCoeff=OBC)
-    NWATER = basicFormulas.N_waterVapor(frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, water_data=WD, basicCoeff=WBC)
+    NOXYGEN = basicFormulas.N_oxygen(frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature,oxygen_data=OXD)
+    NWATER = basicFormulas.N_waterVapor(frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, water_data=WD)
     gamma = 0.1820 * frequency * (NOXYGEN + NWATER)
     return gamma
 
 #Valid frequency Range 50.474214 to 350 GHZ
-def slantPath_instantanueousOxygen_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, OXD, BC, coi):
+def slantPath_instantanueousOxygen_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, OXD, coi):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
     ps = barometric_pressure-es
-    gamma = 0.1820 * frequency * basicFormulas.N_oxygen(frequency=frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, oxygen_data=OXD, basicCoeff=BC)
+    gamma = 0.1820 * frequency * basicFormulas.N_oxygen(frequency=frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, oxygen_data=OXD)
     coefficients = getCoefficients(frequency,coi)
     h0 = coefficients[0]+coefficients[1]*Temperature+coefficients[2]*barometric_pressure+coefficients[3]*water_vapor_density
     A0 = (gamma*h0)/math.sin(math.radians(elevation))
     return A0
 
 #Valid frequency Range 22.235080 to 1780 GHz
-def slantPath_instantanueousWater_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, WD, BC):
+def slantPath_instantanueousWater_attenuation(frequency, barometric_pressure, Temperature, water_vapor_density,elevation, WD):
     es = basicFormulas.water_vapor_partial_pressure(water_vapor_density=water_vapor_density,temp=Temperature)
     ps = barometric_pressure-es
-    gamma = 0.1820 * frequency * basicFormulas.N_waterVapor(frequency=frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, water_data=WD, basicCoeff=BC)
+    gamma = 0.1820 * frequency * basicFormulas.N_waterVapor(frequency=frequency, dry_air_pressure=ps, water_vapor_partial_pressure=es, temp=Temperature, water_data=WD)
     freq_list = [22.235080, 183.310087, 325.152888] #GHZ
     a_list = [2.6846, 5.8905, 2.9810]
     b_list = [2.7649, 4.9219, 3.0748]
