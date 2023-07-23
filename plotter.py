@@ -167,7 +167,7 @@ class Application(tk.Tk):
         instantWater_list = [AT.slantPath_instantanueousWater_attenuation(frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, elevation=elevation, WD=self.water_data, BC=W_basic_coefficients_W)
             for freq, W_basic_coefficients_W in zip(frequency_band_W, W_basic_coefficients_list_W)]
-        
+        self.plotMercatorPoint(lat, long)
         self.replotInstantaneousOxygen(frequency_band_OX, instantOxygen_list, lat, long)
         self.replotInstantaneousWater(frequency_band_W, instantWater_list, lat, long)
 
