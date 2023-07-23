@@ -200,6 +200,7 @@ class Application(tk.Tk):
             Temperature=self.temperature, elevation=elevation, WD=self.water_data, BC=W_basic_coefficients_W)
             for freq, W_basic_coefficients_W in zip(frequency_band_W, W_basic_coefficients_list_W)]
         
+        self.replotMercatorPoint(lat, long)
         self.replotAttenuationFrequencyBand(frequency_band_SA, spga_list, lat, long)
         self.replotInstantaneousOxygen(frequency_band_OX, instantOxygen_list, lat, long)
         self.replotInstantaneousWater(frequency_band_W, instantWater_list, lat, long)
@@ -250,27 +251,25 @@ class Application(tk.Tk):
         gs = gridspec.GridSpec(1,1)
         ax1 = self.figure1.add_subplot(gs[0,0])
         self.figure1.subplots_adjust(left=0, right=1, bottom=0, top=1)
-        m = Basemap(ax=ax1, projection='merc', llcrnrlat=-80, urcrnrlat=80, llcrnrlon=-180, urcrnrlon=180, resolution='l')
-        m.fillcontinents(color=(0, 158/255, 96/255), lake_color=(0,119/255, 190/255))
-        m.drawmapboundary(fill_color=(0,119/255, 190/255))
-        m.drawcoastlines()
-        m.drawcountries()
+        self.m = Basemap(ax=ax1, projection='merc', llcrnrlat=-80, urcrnrlat=80, llcrnrlon=-180, urcrnrlon=180, resolution='l')
+        self.m.fillcontinents(color=(0, 158/255, 96/255), lake_color=(0,119/255, 190/255))
+        self.m.drawmapboundary(fill_color=(0,119/255, 190/255))
+        self.m.drawcoastlines()
+        self.m.drawcountries()
         
         self.canvas1.draw()
 
     def plotMercatorPoint(self, mlat, mlon):
         ax1 = self.figure1.gca()
-        ax1.scatter(mlat, mlon, color='red', s=50)
+        x,y = self.m(mlon, mlat)
+        self.city_point = ax1.scatter(x, y, color='red', s=25)
         self.canvas1.draw()
-
-    def mercator_projection(self, lat, lon):
-        """
-        Convert latitude and longitude to Mercator coordinates.
-        """
-        r_major = 6378137.0  # Earth's semi-major axis (in meters)
-        x = r_major * np.radians(lon)
-        y = r_major * np.log(np.tan(np.pi / 4 + np.radians(lat) / 2))
-        return x, y
+    
+    def replotMercatorPoint(self, mlat, mlon):
+        ax1 = self.figure1.gca()
+        x,y = self.m(mlon, mlat)
+        self.city_point.set_offsets([(x,y)])
+        self.canvas1.draw()
 
     #This updates plot #2
     def plotAttenuationFrequencyBand(self,x_data, y_data, lat, long):
