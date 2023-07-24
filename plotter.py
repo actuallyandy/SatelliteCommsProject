@@ -156,13 +156,15 @@ class Application(tk.Tk):
         long = self.lon_entry.get()
         frequency_band_SA = np.linspace(50.474214, 834.145546, 1000)
         
-        frequency_band_OX = np.linspace(50.474214, 350, 1000)
+        #frequency_band_OX = np.linspace(50.474214, 350, 1000)
+        frequency_band_OX = np.linspace(1, 1000, 1000)
         OX_basic_coefficients_list_OX = [BF.getBasicCoefficients(frequency=freq,data=self.oxygen_data) for freq in frequency_band_OX]
         instantOxygen_list = [AT.slantPath_instantanueousOxygen_attenuation(frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, elevation=elevation, OXD=self.oxygen_data, BC=OX_basic_coefficients_OX, coi=self.coefficients_of_interest)
             for freq, OX_basic_coefficients_OX in zip(frequency_band_OX, OX_basic_coefficients_list_OX)]
 
-        frequency_band_W = np.linspace(22.235080, 1000, 1000)
+        #frequency_band_W = np.linspace(22.235080, 1000, 1000)
+        frequency_band_W = np.linspace(1, 1000, 1000)
         W_basic_coefficients_list_W = [BF.getBasicCoefficients(frequency=freq, data=self.water_data) for freq in frequency_band_W]
         instantWater_list = [AT.slantPath_instantanueousWater_attenuation(frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, elevation=elevation, WD=self.water_data, BC=W_basic_coefficients_W)
@@ -180,18 +182,21 @@ class Application(tk.Tk):
         self.temperature_value_label.config(text="{:.2f}".format(((self.temperature-273.15)*9/5)+32)+" °F")
 
         elevation = self.elevation_slider.get()
-        frequency_band_SA = np.linspace(50.474214, 834.145546, 1000)
+        #frequency_band_SA = np.linspace(50.474214, 834.145546, 1000)
+        frequency_band_SA = np.linspace(1, 1000, 1000)
         spga_list = [AT.specific_gaseous_attenuation(
             frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, OXD=self.oxygen_data, WD=self.water_data) 
             for freq in frequency_band_SA]
         
-        frequency_band_OX = np.linspace(50.474214, 350, 1000)
+        #frequency_band_OX = np.linspace(50.474214, 350, 1000)
+        frequency_band_OX = np.linspace(1, 1000, 1000)
         instantOxygen_list = [AT.slantPath_instantanueousOxygen_attenuation(frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, elevation=elevation, OXD=self.oxygen_data, coi=self.coefficients_of_interest)
             for freq in frequency_band_OX]
 
-        frequency_band_W = np.linspace(22.235080, 1000, 1000)
+        #frequency_band_W = np.linspace(22.235080, 1000, 1000)
+        frequency_band_W = np.linspace(1, 1000, 1000)
         instantWater_list = [AT.slantPath_instantanueousWater_attenuation(frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, elevation=elevation, WD=self.water_data)
             for freq in frequency_band_W]
@@ -217,18 +222,21 @@ class Application(tk.Tk):
         self.wvd_value_label.config(text="{:.2f}".format(self.water_vapor_density)+" g/m^3")
         self.temperature_value_label.config(text="{:.2f}".format(((self.temperature-273.15)*9/5)+32)+" °F")
 
-        frequency_band_SA = np.linspace(50.474214, 834.145546, 1000)
+        #frequency_band_SA = np.linspace(50.474214, 834.145546, 1000)
+        frequency_band_SA = np.linspace(1, 1000, 1000)
         spga_list = [AT.specific_gaseous_attenuation(
             frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, OXD=self.oxygen_data, WD=self.water_data) 
             for freq in frequency_band_SA]
         
-        frequency_band_OX = np.linspace(50.474214, 350, 1000)
+        #frequency_band_OX = np.linspace(50.474214, 350, 1000)
+        frequency_band_OX = np.linspace(1, 1000, 1000)
         instantOxygen_list = [AT.slantPath_instantanueousOxygen_attenuation(frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, elevation=elevation, OXD=self.oxygen_data, coi=self.coefficients_of_interest)
             for freq in frequency_band_OX]
 
-        frequency_band_W = np.linspace(22.235080, 1000, 1000)
+        #frequency_band_W = np.linspace(22.235080, 1000, 1000)
+        frequency_band_W = np.linspace(1, 1000, 1000)
         instantWater_list = [AT.slantPath_instantanueousWater_attenuation(frequency=freq, barometric_pressure=self.pressure, water_vapor_density=self.water_vapor_density,
             Temperature=self.temperature, elevation=elevation, WD=self.water_data)
             for freq in frequency_band_W]
